@@ -22,9 +22,18 @@ const io = new Server(httpServer, {
     console.log('connection')
 
     socket.emit('message', 'Welcome!')
+    socket.broadcast.emit('message', 'A new user has joined')
 
     socket.on('sendMsg', (msg) => {
         io.emit('message', msg)
+    })
+
+    socket.on('location', (location) => {
+        io.emit('message', `https://google.com/maps/?q=${location.latitude},${location.longitude}`)
+    })
+
+    socket.on('disconnect', () => {
+        io.emit('message', 'A user has left')
     })
   })
 
