@@ -16,11 +16,17 @@ const httpServer = http.createServer(app)
 
 const io = new Server(httpServer, {
     // ...
-  });
+  })
 
   io.on("connection", (socket) => {
     console.log('connection')
-  });
+
+    socket.emit('message', 'Welcome!')
+
+    socket.on('sendMsg', (msg) => {
+        io.emit('message', msg)
+    })
+  })
 
 // Setup static directories
 app.use(express.static(website_path))
