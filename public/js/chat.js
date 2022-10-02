@@ -7,8 +7,10 @@ socket.on('message', (msg) => {
 document.querySelector('#msgForm').addEventListener('submit', (event) => {
     event.preventDefault()
 
-    const msg = event.target.elementsg.formInput.value
-    socket.emit('sendMsg', msg)
+    const msg = event.target.elements.formInput.value
+    socket.emit('sendMsg', msg, (ack) => {
+        console.log(ack)
+    })
 })
 
 document.querySelector('#location').addEventListener('click', () => {
@@ -20,6 +22,8 @@ document.querySelector('#location').addEventListener('click', () => {
         socket.emit('location', { 
             latitude: position.coords.latitude, 
             longitude: position.coords.longitude
+        }, (ack) => {
+            console.log(ack)
         })
     })
 })
