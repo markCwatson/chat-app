@@ -6,7 +6,10 @@
     </head>
 
     <body>
-        Hi
+        Chat App
+
+        <div id="messages"></div>
+
         <form id="msgForm">
             <input name="formInput" placeholder="enter a message">
             <button>send</button>
@@ -14,6 +17,13 @@
 
         <button id="location">Send Location</button>
 
+        <script id="message-template" type="text-html">
+            <div>
+                <p>{{msg}}</p>
+            </div>
+        </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.1.0/mustache.min.js"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/js/chat.js"></script>
     </body>
