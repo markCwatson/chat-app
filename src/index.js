@@ -18,13 +18,13 @@ const httpServer = http.createServer(app)
 
 const io = new Server(httpServer, {
     // ...
-  })
+})
 
-  io.on("connection", (socket) => {
-    console.log('connection')
-
-    socket.emit('message', generateMessage('Welcome!'))
-    socket.broadcast.emit('message', 'A new user has joined')
+io.on("connection", (socket) => {
+    socket.join('join', ({ name, room }) => {
+        socket.emit('message', generateMessage('Welcome!'))
+        socket.broadcast.to(room).emit('message', `${name} has joined!`)
+    })
 
     socket.on('sendMsg', (msg, callback) => {
         const filter = new Filter()
@@ -44,7 +44,7 @@ const io = new Server(httpServer, {
     socket.on('disconnect', () => {
         io.emit('message', generateMessage('A user has left'))
     })
-  })
+})
 
 // Setup static directories
 app.use(express.static(website_path))
