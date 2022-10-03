@@ -7,6 +7,7 @@ import { Server } from 'socket.io'
 
 import { Filter } from '../utils/bad-words.js'
 import { generateMessage, generateLocationMessage } from '../utils/messages.js';
+import { addUser, removeUser, getUser, getUsersInRoom } from '../utils/users.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,9 +22,21 @@ const io = new Server(httpServer, {
 })
 
 io.on("connection", (socket) => {
-    socket.join('join', ({ name, room }) => {
+    console.log(`New connestion on socket ${socket.id}`)
+
+    socket.on('join', ({ username, room }, callback) => {
+        const { error, user } = addUser({ id: socket.id, username, room })
+
+        if (error) {
+            return callback(error)
+        }
+
+        socket.join(user.room)
+
         socket.emit('message', generateMessage('Welcome!'))
-        socket.broadcast.to(room).emit('message', `${name} has joined!`)
+        socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined!`))
+
+        callback()
     })
 
     socket.on('sendMsg', (msg, callback) => {
@@ -42,7 +55,11 @@ io.on("connection", (socket) => {
     })
 
     socket.on('disconnect', () => {
-        io.emit('message', generateMessage('A user has left'))
+        const user = removeUser(socket.id)
+
+        if (user) {
+            io.to(user.room).emit('message', generateMessage(`${user.username} has left the room.`))
+        }
     })
 })
 

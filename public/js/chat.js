@@ -10,7 +10,8 @@ const $messages = document.querySelector('#messages')
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
 
-const {name, room} = Qs.parse(location.search, { ignoreQueryPrefix: true })
+// The following pulls the username and room off of the query string when the join button is pressed
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
 socket.on('message', (msg) => {
     const html = Mustache.render(messageTemplate, {
@@ -59,4 +60,11 @@ $locationButton.addEventListener('click', () => {
     })
 })
 
-socket.emit('join')
+socket.emit('join', { username, room }, (error) => {
+    if (error) {
+        alert(error)
+
+        // Send back to home page
+        location.href = '/'
+    }
+})
