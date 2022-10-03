@@ -9,12 +9,14 @@ const $messages = document.querySelector('#messages')
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
+const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
 
 // The following pulls the username and room off of the query string when the join button is pressed
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
 socket.on('message', (msg) => {
     const html = Mustache.render(messageTemplate, {
+        username: msg.username,
         msg: msg.text,
         createdAt: moment(msg.createdAt).format('h:mm A')
     })
@@ -23,6 +25,7 @@ socket.on('message', (msg) => {
 
 socket.on('locationMessage', (msg) => {
     const html = Mustache.render(locationMessageTemplate, {
+        username: msg.username,
         url: msg.url,
         createdAt: moment(msg.createdAt).format('h:mm A')
     })
@@ -67,4 +70,12 @@ socket.emit('join', { username, room }, (error) => {
         // Send back to home page
         location.href = '/'
     }
+})
+
+socket.on('population', ( {room, users }) => {
+    const html = Mustache.render(sidebarTemplate, {
+        room,
+        users
+    })
+    document.querySelector('#sidebar').innerHTML = html
 })
