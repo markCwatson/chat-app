@@ -14,6 +14,18 @@ const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML
 // The following pulls the username and room off of the query string when the join button is pressed
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
+const autoscroll = () => {
+    const $newMsg = $messages.lastElementChild
+    const newMsgHeight = $newMsg.offsetHeight + parseInt(getComputedStyle($newMsg).marginBottom)
+    const contentHeight = $messages.scrollHeight
+    const scrollOffset = $messages.scrollTop + $messages.offsetHeight
+
+    if (contentHeight - newMsgHeight <= scrollOffset) {
+        // Auto-scroll to bottom
+        $messages.scrollTop = $messages.scrollHeight
+    }
+}
+
 socket.on('message', (msg) => {
     const html = Mustache.render(messageTemplate, {
         username: msg.username,
@@ -21,6 +33,7 @@ socket.on('message', (msg) => {
         createdAt: moment(msg.createdAt).format('h:mm A')
     })
     $messages.insertAdjacentHTML('beforeend', html)
+    autoscroll()
 })
 
 socket.on('locationMessage', (msg) => {
@@ -30,6 +43,7 @@ socket.on('locationMessage', (msg) => {
         createdAt: moment(msg.createdAt).format('h:mm A')
     })
     $messages.insertAdjacentHTML('beforeend', html)
+    autoscroll()
 })
 
 $messageForm.addEventListener('submit', (event) => {
